@@ -8,10 +8,9 @@ st.set_page_config(page_title="AI Post Generator", page_icon="🛍️")
 if "GEMINI_API_KEY" in st.secrets:
     api_key = st.secrets["GEMINI_API_KEY"]
 else:
-    # এখানে সরাসরি কী দিলেও কাজ করবে যদি সিক্রেটস কাজ না করে
-    api_key = "আপনার_নতুন_কী_এখানে"
+    api_key = "আপনার_কি_এখানে"
 
-# ১. এপিআই কনফিগার করার সময় সরাসরি ভার্সন ফিক্স করে দেওয়া
+# সরাসরি কনফিগার করা
 genai.configure(api_key=api_key)
 
 st.title("📸 AI Product Post Generator")
@@ -25,27 +24,21 @@ if uploaded_file:
     if st.button("পোস্ট তৈরি করো ✨"):
         with st.spinner('এআই কাজ করছে...'):
             try:
-                # Gemini 1.5 Flash মডেল সরাসরি কল করা
-                # কোনো 'models/' প্রিফিক্স ব্যবহার করবেন না
-                model = genai.GenerativeModel(model_name='gemini-1.5-flash')
+                # মডেল কল করার সময় সরাসরি জেনারেটিভ মডেল অবজেক্ট ব্যবহার
+                model = genai.GenerativeModel(
+                    model_name='gemini-1.5-flash',
+                    generation_config={"temperature": 0.7}
+                )
                 
                 # প্রম্পট
-                prompt = "Analyze this product image and write a catchy Facebook and Instagram post in Bengali."
+                prompt = "Identify this product from the image and write a social media post in Bengali."
                 
-                # ছবি থেকে কন্টেন্ট জেনারেশন
+                # কন্টেন্ট জেনারেশন
                 response = model.generate_content([prompt, image])
                 
                 st.success("তৈরি হয়ে গেছে!")
-                st.markdown("---")
                 st.markdown(response.text)
                 
             except Exception as e:
-                # যদি ফ্ল্যাশ মডেল কাজ না করে, আমরা ডিফল্ট 'gemini-pro-vision' ট্রাই করব (এটি পুরনো কিন্তু স্টেবল)
-                try:
-                    st.info("বিকল্প মডেলে চেষ্টা করা হচ্ছে...")
-                    backup_model = genai.GenerativeModel(model_name='gemini-pro-vision')
-                    response = backup_model.generate_content([prompt, image])
-                    st.success("সফল হয়েছে (Backup Model)!")
-                    st.markdown(response.text)
-                except Exception as e2:
-                    st.error(f"দুঃখিত, এপিআই সাপোর্ট করছে না। এরর: {e2}")
+                st.error(f"এরর ডিটেইলস: {e}")
+                st.info("যদি এই এরর আসে, তবে বুঝতে হবে আপনার জিমেইল অ্যাকাউন্টটি গুগলের এই সার্ভিসটি ব্যবহারের জন্য এখনো পুরোপুরি প্রস্তুত নয়।")
