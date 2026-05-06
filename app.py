@@ -2,37 +2,44 @@ import streamlit as st
 import google.generativeai as genai
 from PIL import Image
 
-# ১. পেজ সেটআপ
-st.set_page_config(page_title="AI Product Post Generator", page_icon="🛍️")
+st.set_page_config(page_title="AI Post Generator", page_icon="🛍️")
 
-# ২. নিরাপদভাবে এপিআই কি লোড করা (Streamlit Secrets থেকে)
+# এপিআই কি সেটআপ
 try:
-    # এটি Streamlit Cloud এর 'Secrets' অপশন থেকে কি-টি খুঁজে নেবে
-    api_key = st.secrets["GEMINI_API_KEY"]
+    if "GEMINI_API_KEY" in st.secrets:
+        api_key = st.secrets["GEMINI_API_KEY"]
+    else:
+        # যদি Secrets-এ না থাকে তবে এখানে কি-টি সরাসরি দিয়ে চেক করতে পারেন
+        api_key = "AIzaSyDpkDgZ92pdCNcaVOkEAqKVkJwUUyy9oaI"
+    
     genai.configure(api_key=api_key)
 except Exception:
-    st.error("এপিআই কি (API Key) পাওয়া যায়নি! দয়া করে Streamlit Settings-এ এটি সেট করুন।")
+    st.error("API Key খুঁজে পাওয়া যায়নি।")
     st.stop()
 
-# ৩. ইন্টারফেস
 st.title("📸 AI Product Post Generator")
-st.write("আপনার প্রোডাক্টের ছবি থেকে ফেসবুক ও ইন্সটাগ্রাম পোস্ট তৈরি করুন।")
 
-uploaded_file = st.file_uploader("ছবি আপলোড করুন...", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("আপনার প্রোডাক্টের ছবি আপলোড করুন...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file)
-    st.image(image, caption='আপনার আপলোড করা ছবি', use_container_width=True)
+    st.image(image, caption='প্রিভিউ', use_container_width=True)
     
     if st.button("পোস্ট তৈরি করো ✨"):
-        with st.spinner('এআই লিখছে...'):
+        with st.spinner('এআই কাজ করছে...'):
             try:
-                model = genai.GenerativeModel('gemini-1.5-flash')
-                prompt = "Analyze this image and write a catchy Facebook and Instagram post in Bengali for this product with hashtags."
+                # 'gemini-1.5-flash-latest' ব্যবহার করলে মডেল নট ফাউন্ড এরর আসবে না
+                model = genai.GenerativeModel('models/gemini-1.5-flash-latest')
                 
+                prompt = "Analyze this image and write an engaging Facebook and Instagram post in Bengali for this product with hashtags."
+                
+                # ইমেজ ইনপুট নিয়ে কন্টেন্ট জেনারেট
                 response = model.generate_content([prompt, image])
-                st.success("সফলভাবে তৈরি হয়েছে!")
+                
+                st.success("তৈরি হয়ে গেছে!")
                 st.markdown("---")
                 st.markdown(response.text)
+                
             except Exception as e:
-                st.error(f"একটি সমস্যা হয়েছে: {e}")
+                st.error(f"মডেল লোড করতে সমস্যা হচ্ছে। এরর: {e}")
+                st.info("টিপস: আপনার requirements.txt ফাইলে google-generativeai এর লেটেস্ট ভার্সন আছে কি না নিশ্চিত করুন।")
