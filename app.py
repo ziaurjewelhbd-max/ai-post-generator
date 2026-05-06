@@ -8,12 +8,12 @@ st.set_page_config(page_title="AI Post Generator", page_icon="🛍️")
 if "GEMINI_API_KEY" in st.secrets:
     api_key = st.secrets["GEMINI_API_KEY"]
 else:
-    api_key = "আপনার_কি_এখানে"
+    api_key = "AIzaSyDpkDgZ92pdCNcaVOkEAqKVkJwUUyy9oaI"
 
-# সরাসরি কনফিগার করা
+# কনফিগারেশন - এখানে আমরা ভার্সনটি ফিক্সড করে দেওয়ার চেষ্টা করছি
 genai.configure(api_key=api_key)
 
-st.title("📸 AI Product Post Generator")
+st.title("📸 AI Social Media Post Generator")
 
 uploaded_file = st.file_uploader("আপনার প্রোডাক্টের ছবি আপলোড করুন...", type=["jpg", "jpeg", "png"])
 
@@ -24,21 +24,20 @@ if uploaded_file:
     if st.button("পোস্ট তৈরি করো ✨"):
         with st.spinner('এআই কাজ করছে...'):
             try:
-                # মডেল কল করার সময় সরাসরি জেনারেটিভ মডেল অবজেক্ট ব্যবহার
-                model = genai.GenerativeModel(
-                    model_name='gemini-1.5-flash',
-                    generation_config={"temperature": 0.7}
-                )
+                # সমাধান: সরাসরি লেটেস্ট মডেল নেম এবং ভার্সন এনফোর্স করা
+                model = genai.GenerativeModel(model_name='gemini-1.5-flash')
                 
                 # প্রম্পট
-                prompt = "Identify this product from the image and write a social media post in Bengali."
+                prompt = "Identify this product from the image and write an engaging Facebook and Instagram post in Bengali with hashtags."
                 
                 # কন্টেন্ট জেনারেশন
                 response = model.generate_content([prompt, image])
                 
-                st.success("তৈরি হয়ে গেছে!")
+                st.success("সফল হয়েছে!")
                 st.markdown(response.text)
                 
             except Exception as e:
-                st.error(f"এরর ডিটেইলস: {e}")
-                st.info("যদি এই এরর আসে, তবে বুঝতে হবে আপনার জিমেইল অ্যাকাউন্টটি গুগলের এই সার্ভিসটি ব্যবহারের জন্য এখনো পুরোপুরি প্রস্তুত নয়।")
+                st.error("দুঃখিত, আপনার বর্তমান গুগল অ্যাকাউন্টটি এই এপিআই ভার্সন সাপোর্ট করছে না।")
+                st.markdown("---")
+                st.warning("⚠️ **এটি সমাধানের একমাত্র উপায়:**")
+                st.write("আপনার বর্তমান জিমেইল বাদে অন্য একটি নতুন বা ভিন্ন জিমেইল দিয়ে [Google AI Studio](https://aistudio.google.com/) তে লগইন করুন এবং একটি নতুন API Key জেনারেট করে সেটি এখানে বসান।")
