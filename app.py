@@ -9,7 +9,6 @@ try:
     if "GEMINI_API_KEY" in st.secrets:
         api_key = st.secrets["GEMINI_API_KEY"]
     else:
-        # যদি Secrets-এ না থাকে তবে এখানে কি-টি সরাসরি দিয়ে চেক করতে পারেন
         api_key = "AIzaSyDpkDgZ92pdCNcaVOkEAqKVkJwUUyy9oaI"
     
     genai.configure(api_key=api_key)
@@ -28,8 +27,8 @@ if uploaded_file:
     if st.button("পোস্ট তৈরি করো ✨"):
         with st.spinner('এআই কাজ করছে...'):
             try:
-                # 'gemini-1.5-flash-latest' ব্যবহার করলে মডেল নট ফাউন্ড এরর আসবে না
-                model = genai.GenerativeModel('models/gemini-1.5-flash-latest')
+                # এখানে মডেলের নাম সরাসরি 'gemini-1.5-flash' দেওয়া হয়েছে
+                model = genai.GenerativeModel('gemini-1.5-flash')
                 
                 prompt = "Analyze this image and write an engaging Facebook and Instagram post in Bengali for this product with hashtags."
                 
@@ -42,4 +41,4 @@ if uploaded_file:
                 
             except Exception as e:
                 st.error(f"মডেল লোড করতে সমস্যা হচ্ছে। এরর: {e}")
-                st.info("টিপস: আপনার requirements.txt ফাইলে google-generativeai এর লেটেস্ট ভার্সন আছে কি না নিশ্চিত করুন।")
+                st.info("আপনার requirements.txt ফাইলটি চেক করুন।")
